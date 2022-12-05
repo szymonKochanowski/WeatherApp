@@ -7,6 +7,7 @@ import com.kohan.WeatherApp.repository.WeatherRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,8 +23,10 @@ public class WeatherService {
     @Autowired
     private WeatherMapper weatherMapper;
 
+    @Value("${test.api_key}")
+    private String api_key;
+
     private static final String WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
-    private static final String API_KEY = "d36b0893439f6ed9ed2f452508ffeed8";
 
     private RestTemplate restTemplate = new RestTemplate();
 
@@ -31,7 +34,7 @@ public class WeatherService {
     public WeatherDto getWeatherForCityByGeolocation(Double lat, Double lon, String cityName) throws Exception {
         log.info("Start to get weather for city with lat: {}, lon {}, city name: {}", lat, lon, cityName);
         try{
-            String response = restTemplate.getForObject(WEATHER_URL + "?lat={lat}&lon={lon}&appid=" + API_KEY + "&units=metric", String.class, lat, lon);
+            String response = restTemplate.getForObject(WEATHER_URL + "?lat={lat}&lon={lon}&appid=" + api_key + "&units=metric", String.class, lat, lon);
             JSONObject jsonObject = new JSONObject(response);
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 

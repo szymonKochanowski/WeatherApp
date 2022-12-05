@@ -7,6 +7,7 @@ import com.kohan.WeatherApp.mapper.GeolocationMapper;
 import com.kohan.WeatherApp.repository.GeolocationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,15 +24,17 @@ public class GeolocationService {
     @Autowired
     private GeolocationRepository geolocationRepository;
 
+    @Value("${test.api_key}")
+    private String api_key;
+
     private static final String GEOLOCATION_URL = "http://api.openweathermap.org/geo/1.0/direct";
-    private static final String API_KEY = "d36b0893439f6ed9ed2f452508ffeed8";
 
     private RestTemplate restTemplate = new RestTemplate();
 
     public GeolocationDto getGeolocationDtoByCityName(String cityName) {
         log.info("Start to get geolocation for city with name: " + cityName);
         try{
-            Geolocation[] objects = restTemplate.getForObject(GEOLOCATION_URL + "?q={cityName}&appid=" + API_KEY, Geolocation[].class, cityName);
+            Geolocation[] objects = restTemplate.getForObject(GEOLOCATION_URL + "?q={cityName}&appid=" + api_key, Geolocation[].class, cityName);
             log.info(objects.toString());
             List<Geolocation> geolocationList = Arrays.asList(objects);
 

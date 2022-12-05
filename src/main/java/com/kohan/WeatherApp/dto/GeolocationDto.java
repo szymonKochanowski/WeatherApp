@@ -1,16 +1,10 @@
 package com.kohan.WeatherApp.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class GeolocationDto {
-
-    private String city;
-    private String country;
-    private Double lat;
-    private Double lon;
+public record GeolocationDto(
+        @NotNull  String city,
+        @NotNull String country,
+        @NotNull Double lat,
+        @NotNull Double lon) {
 }
