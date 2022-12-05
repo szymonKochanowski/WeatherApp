@@ -30,7 +30,7 @@ public class WeatherController {
         log.info("Start to get weather for city with name: " + cityName);
         try{
             GeolocationDto geolocationDto = geolocationService.getGeolocationDtoByCityName(cityName);
-            return ResponseEntity.ok(weatherService.getWeatherForCityByGeolocation(geolocationDto.getLat(), geolocationDto.getLon(), cityName));
+            return ResponseEntity.ok(weatherService.getWeatherForCityByGeolocation(geolocationDto.lat(), geolocationDto.lon(), cityName));
         } catch (GeolocationNotFoundException ex) {
             return new ResponseEntity(ex.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {

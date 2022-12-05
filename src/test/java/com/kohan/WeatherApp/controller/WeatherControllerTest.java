@@ -61,9 +61,9 @@ class WeatherControllerTest {
                 .andReturn();
         //Then
         WeatherDto actualWeatherDto = objectMapper.readValue(result.getResponse().getContentAsString(), WeatherDto.class);
-        assertEquals(expectedWeatherDto.getCity(), actualWeatherDto.getCity());
-        assertEquals(expectedWeatherDto.getCountry(), actualWeatherDto.getCountry());
-        assertEquals(expectedWeatherDto.getTemperature(), actualWeatherDto.getTemperature());
+        assertEquals(expectedWeatherDto.city(), actualWeatherDto.city());
+        assertEquals(expectedWeatherDto.country(), actualWeatherDto.country());
+        assertEquals(expectedWeatherDto.temperature(), actualWeatherDto.temperature());
     }
 
     @Test
