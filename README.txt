@@ -17,3 +17,5 @@ Used:
 - Lombok,
 - JSON,
 - Mockito 5 (JUnit Jupiter).
+
+Test coverage is 95% (exclude entity and mappers classes).

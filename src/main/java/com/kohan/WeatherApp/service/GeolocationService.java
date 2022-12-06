@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.naming.ServiceUnavailableException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,15 +29,18 @@ public class GeolocationService {
     private String api_key;
 
     private static final String GEOLOCATION_URL = "http://api.openweathermap.org/geo/1.0/direct";
-
     private RestTemplate restTemplate = new RestTemplate();
 
-    public GeolocationDto getGeolocationDtoByCityName(String cityName) {
+    public GeolocationDto getGeolocationDtoByCityName(String cityName) throws GeolocationNotFoundException {
         log.info("Start to get geolocation for city with name: " + cityName);
         try{
-            Geolocation[] objects = restTemplate.getForObject(GEOLOCATION_URL + "?q={cityName}&appid=" + api_key, Geolocation[].class, cityName);
-            log.info(objects.toString());
-            List<Geolocation> geolocationList = Arrays.asList(objects);
+            Geolocation[] geolocationTable = restTemplate.getForObject(GEOLOCATION_URL + "?q={cityName}&appid=" + api_key, Geolocation[].class, cityName);
+            if (geolocationTable == null) {
+                log.error("Error with external API responsible for get geolocation!");
+                throw new ServiceUnavailableException("Error with external API responsible for get geolocation!");
+            }
+            List<Geolocation> geolocationList = Arrays.asList(geolocationTable);
+            log.info(geolocationList.get(0).toString());
 
             Geolocation geolocation = new Geolocation();
             geolocation.setCountry(geolocationList.get(0).getCountry());

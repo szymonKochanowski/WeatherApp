@@ -33,6 +33,7 @@ public class Weather {
 
     @Column(name = "wind_speed")
     private double windSpeed;
+
     private int pressure;
     private int humidity;
     private int clouds;
