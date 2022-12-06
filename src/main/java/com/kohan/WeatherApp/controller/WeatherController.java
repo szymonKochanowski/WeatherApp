@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.naming.ServiceUnavailableException;
+
 @RestController
 @Slf4j
 @RequestMapping("/weather")
@@ -33,6 +35,8 @@ public class WeatherController {
             return ResponseEntity.ok(weatherService.getWeatherForCityByGeolocation(geolocationDto.lat(), geolocationDto.lon(), cityName));
         } catch (GeolocationNotFoundException ex) {
             return new ResponseEntity(ex.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (ServiceUnavailableException exc) {
+            return new ResponseEntity(exc.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
