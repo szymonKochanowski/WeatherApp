@@ -9,4 +9,6 @@ public interface WeatherMapper {
 
     WeatherDto weatherToWeatherDto(Weather weather);
 
+    Weather weatherDtoToWeather(WeatherDto weatherDto);
+
 }

@@ -40,4 +40,7 @@ public class Weather {
 
     @Column(name = "date_time")
     private Timestamp dateTime;
+
+    private Double latitude;
+    private Double longitude;
 }

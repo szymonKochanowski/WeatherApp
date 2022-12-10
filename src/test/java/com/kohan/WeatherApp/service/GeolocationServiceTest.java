@@ -57,8 +57,8 @@ class GeolocationServiceTest {
         //Then
         assertEquals(expectedGeolocationDto.city(), actualGeolocationDto.city());
         assertEquals(expectedGeolocationDto.country(), actualGeolocationDto.country());
-        assertEquals(expectedGeolocationDto.lon(), actualGeolocationDto.lon());
-        assertEquals(expectedGeolocationDto.lat(), actualGeolocationDto.lat());
+        assertEquals(expectedGeolocationDto.longitude(), actualGeolocationDto.longitude());
+        assertEquals(expectedGeolocationDto.latitude(), actualGeolocationDto.latitude());
     }
 
     @Test

@@ -50,7 +50,7 @@ class WeatherControllerTest {
         Double lat = 50.072136;
         Double lon = 19.947226;
         GeolocationDto geolocationDto = new GeolocationDto(cityName, "PL", lat, lon);
-        WeatherDto expectedWeatherDto = new WeatherDto("Smog", cityName, "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()));
+        WeatherDto expectedWeatherDto = new WeatherDto("Smog", cityName, "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()), lat, lon);
         when(geolocationService.getGeolocationDtoByCityName(cityName)).thenReturn(geolocationDto);
         when(weatherService.getWeatherForCityByGeolocation(lat, lon, cityName)).thenReturn(expectedWeatherDto);
         //When

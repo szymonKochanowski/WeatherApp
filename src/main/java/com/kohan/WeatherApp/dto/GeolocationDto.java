@@ -5,6 +5,6 @@ import jakarta.validation.constraints.NotNull;
 public record GeolocationDto(
         @NotNull  String city,
         @NotNull String country,
-        @NotNull Double lat,
-        @NotNull Double lon) {
+        @NotNull Double latitude,
+        @NotNull Double longitude) {
 }
