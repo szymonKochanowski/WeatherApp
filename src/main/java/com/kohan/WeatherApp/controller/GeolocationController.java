@@ -1,11 +1,8 @@
 package com.kohan.WeatherApp.controller;
 
 import com.kohan.WeatherApp.dto.GeolocationDto;
-import com.kohan.WeatherApp.dto.WeatherDto;
 import com.kohan.WeatherApp.exception.GeolocationNotFoundException;
 import com.kohan.WeatherApp.service.GeolocationService;
-import com.kohan.WeatherApp.service.WeatherService;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,21 +11,17 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-@RequestMapping("/weather")
-public class WeatherController {
-
-    @Autowired
-    private WeatherService weatherService;
+@RequestMapping("/geolocation")
+public class GeolocationController {
 
     @Autowired
     private GeolocationService geolocationService;
 
     @GetMapping("/")
-    public ResponseEntity<WeatherDto> getCurrentWeatherForCityByCityName(@RequestParam String cityName) {
-        log.info("Start to get weather for city with name: " + cityName);
-        try{
-            GeolocationDto geolocationDto = geolocationService.getGeolocationDtoByCityName(cityName);
-            return ResponseEntity.ok(weatherService.getWeatherForCityByGeolocation(geolocationDto.latitude(), geolocationDto.longitude(), cityName));
+    public ResponseEntity<GeolocationDto> getGeolocationByCityName(@RequestParam String cityName) {
+        log.info("Start to get geolocation for city: " + cityName);
+        try {
+            return ResponseEntity.ok(geolocationService.getGeolocationDtoByCityName(cityName));
         } catch (GeolocationNotFoundException ex) {
             return new ResponseEntity(ex.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -37,14 +30,12 @@ public class WeatherController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<WeatherDto> addNewWeather(@Valid @RequestBody WeatherDto weatherDto) throws Exception {
-        log.info("Start to add new weather: " + weatherDto);
-        try{
-            return new ResponseEntity(weatherService.addNewWeather(weatherDto), HttpStatus.CREATED) ;
+    public ResponseEntity<GeolocationDto> addGeolocation(@RequestBody GeolocationDto geolocationDto) {
+        log.info("Start to add geolocation for city: " + geolocationDto.city());
+        try {
+            return new ResponseEntity(geolocationService.addNewGeolocation(geolocationDto), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.naming.ServiceUnavailableException;
 import java.sql.Timestamp;
 
 @Service
@@ -34,13 +33,12 @@ public class WeatherService {
     public WeatherDto getWeatherForCityByGeolocation(Double latitude, Double longitude, String cityName) throws Exception {
         log.info("Start to get weather for city with latitude: {}, longitude {}, city name: {}", latitude, longitude, cityName);
         try{
-            String response = restTemplate.getForObject(WEATHER_URL + "?lat={latitude}&lon={longitude}&appid=" + api_key + "&units=metric", String.class, latitude, longitude);
-            if (response == null) {
+            String weatherString = restTemplate.getForObject(WEATHER_URL + "?lat={latitude}&lon={longitude}&appid=" + api_key + "&units=metric", String.class, latitude, longitude);
+            if (weatherString == null) {
                 log.error("Response is null! Error with external API responsible for get weather!");
-                throw new ServiceUnavailableException("Error with external API responsible for get weather!");
             }
-            log.info("Response: " + response);
-            JSONObject jsonObject = new JSONObject(response);
+            log.info("Response: " + weatherString);
+            JSONObject jsonObject = new JSONObject(weatherString);
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
             Weather weather = new Weather();
