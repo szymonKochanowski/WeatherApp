@@ -1,7 +1,9 @@
 package com.kohan.WeatherApp.service;
 
+import com.kohan.WeatherApp.dto.GeolocationDto;
 import com.kohan.WeatherApp.dto.WeatherDto;
 import com.kohan.WeatherApp.entity.Weather;
+import com.kohan.WeatherApp.mapper.GeolocationMapper;
 import com.kohan.WeatherApp.mapper.WeatherMapper;
 import com.kohan.WeatherApp.repository.WeatherRepository;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,12 @@ class WeatherServiceTest {
 
     @Mock
     private RestTemplate restTemplate;
+
+    @Mock
+    private GeolocationMapper geolocationMapper;
+
+    @Mock
+    private GeolocationService geolocationService;
 
     @Test
     void getWeatherForCityByGeolocation() throws Exception {
@@ -82,6 +90,9 @@ class WeatherServiceTest {
         //Given
         Weather weather = new Weather(1, "Smog", "krakow", "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()), 50.072136, 19.947226);
         WeatherDto expectedWeatherDto = new WeatherDto("Smog", "krakow", "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()), 50.072136, 19.947226);
+        GeolocationDto geolocationDto = new GeolocationDto("krakow", "PL", 50.072136,  19.947226);
+
+        when(geolocationService.getGeolocationDtoByCityName(weather.getCity())).thenReturn(geolocationDto);
         when(weatherMapper.weatherDtoToWeather(expectedWeatherDto)).thenReturn(weather);
         when(weatherRepository.save(weather)).thenReturn(weather);
         //When

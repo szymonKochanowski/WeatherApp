@@ -23,6 +23,9 @@ public class WeatherService {
     @Autowired
     private WeatherMapper weatherMapper;
 
+    @Autowired
+    private GeolocationService geolocationService;
+
     @Value("${test.api_key}")
     private String api_key;
 
@@ -70,6 +73,7 @@ public class WeatherService {
     public WeatherDto addNewWeather(WeatherDto weatherDto) throws Exception {
         log.info("Start to add new weather: " + weatherDto);
         try{
+            if (geolocationService.getGeolocationDtoByCityName(weatherDto.city()) != null);
             Weather weather = weatherMapper.weatherDtoToWeather(weatherDto);
             weatherRepository.save(weather);
             return weatherDto;
