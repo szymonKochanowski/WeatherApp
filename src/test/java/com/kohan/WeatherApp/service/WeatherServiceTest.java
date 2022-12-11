@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
@@ -47,11 +48,10 @@ class WeatherServiceTest {
         String cityName = "krakow";
         Double lat = 50.072136;
         Double lon = 19.947226;
-        Weather weather = new Weather(1, "Smog", cityName, "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()));
-        WeatherDto expectedWeatherDto = new WeatherDto("Smog", cityName, "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()));
+        Weather weather = new Weather(1, "Smog", cityName, "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()), lat, lon);
+        WeatherDto expectedWeatherDto = new WeatherDto("Smog", cityName, "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()), lat, lon );
 
         when(restTemplate.getForObject(anyString(), any(), anyDouble(), anyDouble())).thenReturn(response);
-        when(weatherRepository.save(weather)).thenReturn(weather);
         when(weatherMapper.weatherToWeatherDto(any())).thenReturn(expectedWeatherDto);
 
         //When
@@ -76,4 +76,29 @@ class WeatherServiceTest {
         //Then
         assertThrows(Exception.class, () -> weatherService.getWeatherForCityByGeolocation(wrongLat, wrongLon, wrongCityName));
     }
+
+    @Test
+    void addNewWeather() throws Exception {
+        //Given
+        Weather weather = new Weather(1, "Smog", "krakow", "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()), 50.072136, 19.947226);
+        WeatherDto expectedWeatherDto = new WeatherDto("Smog", "krakow", "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()), 50.072136, 19.947226);
+        when(weatherMapper.weatherDtoToWeather(expectedWeatherDto)).thenReturn(weather);
+        when(weatherRepository.save(weather)).thenReturn(weather);
+        //When
+        WeatherDto actualWeatherDto = weatherService.addNewWeather(expectedWeatherDto);
+        //Then
+        assertEquals(expectedWeatherDto, actualWeatherDto);
+    }
+
+    @Test
+    void addNewWeatherReturnException() throws Exception {
+        //Given
+        Weather weather = new Weather(1, "Smog", "krakow", "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()), 50.072136, 19.947226);
+        WeatherDto expectedWeatherDto = new WeatherDto("Smog", "krakow", "PL", 3600, 2.65, -2.1, 4.4, 12.2, 1004, 946, 90, Timestamp.valueOf(LocalDateTime.now()), 50.072136, 19.947226);
+        when(weatherMapper.weatherDtoToWeather(any())).thenThrow(HttpServerErrorException.InternalServerError.class);
+        //When
+        //Then
+        assertThrows(Exception.class, () ->  weatherService.addNewWeather(expectedWeatherDto));
+    }
+
 }

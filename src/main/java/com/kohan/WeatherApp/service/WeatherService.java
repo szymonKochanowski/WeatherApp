@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.naming.ServiceUnavailableException;
 import java.sql.Timestamp;
 
 @Service
@@ -31,16 +30,15 @@ public class WeatherService {
     private RestTemplate restTemplate = new RestTemplate();
 
 
-    public WeatherDto getWeatherForCityByGeolocation(Double lat, Double lon, String cityName) throws Exception {
-        log.info("Start to get weather for city with lat: {}, lon {}, city name: {}", lat, lon, cityName);
+    public WeatherDto getWeatherForCityByGeolocation(Double latitude, Double longitude, String cityName) throws Exception {
+        log.info("Start to get weather for city with latitude: {}, longitude {}, city name: {}", latitude, longitude, cityName);
         try{
-            String response = restTemplate.getForObject(WEATHER_URL + "?lat={lat}&lon={lon}&appid=" + api_key + "&units=metric", String.class, lat, lon);
-            if (response == null) {
-                log.error("Response is null! Error with external API responsible for get weather!");
-                throw new ServiceUnavailableException("Error with external API responsible for get weather!");
+            String weatherString = restTemplate.getForObject(WEATHER_URL + "?lat={latitude}&lon={longitude}&appid=" + api_key + "&units=metric", String.class, latitude, longitude);
+            if (weatherString == null) {
+                log.error("Error with external API responsible for get weather!");
             }
-            log.info("Response: " + response);
-            JSONObject jsonObject = new JSONObject(response);
+            log.info("Response: " + weatherString);
+            JSONObject jsonObject = new JSONObject(weatherString);
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
             Weather weather = new Weather();
@@ -56,7 +54,8 @@ public class WeatherService {
             weather.setPressure(jsonObject.getJSONObject("main").getInt("pressure"));
             weather.setClouds(jsonObject.getJSONObject("clouds").getInt("all"));
             weather.setDateTime(timestamp);
-            weatherRepository.save(weather);
+            weather.setLatitude(latitude);
+            weather.setLongitude(longitude);
 
             WeatherDto weatherDto = weatherMapper.weatherToWeatherDto(weather);
             log.info(weatherDto.toString());
@@ -64,6 +63,18 @@ public class WeatherService {
 
         } catch (Exception e) {
             log.error("Error in method getWeatherForCityByGeolocation!");
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public WeatherDto addNewWeather(WeatherDto weatherDto) throws Exception {
+        log.info("Start to add new weather: " + weatherDto);
+        try{
+            Weather weather = weatherMapper.weatherDtoToWeather(weatherDto);
+            weatherRepository.save(weather);
+            return weatherDto;
+        } catch (Exception e) {
+            log.error("Error in method addNewWeather!");
             throw new Exception(e.getMessage());
         }
     }

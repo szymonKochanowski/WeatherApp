@@ -6,14 +6,11 @@ import com.kohan.WeatherApp.exception.GeolocationNotFoundException;
 import com.kohan.WeatherApp.mapper.GeolocationMapper;
 import com.kohan.WeatherApp.repository.GeolocationRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import javax.naming.ServiceUnavailableException;
-import java.util.Arrays;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -34,31 +31,40 @@ public class GeolocationService {
     public GeolocationDto getGeolocationDtoByCityName(String cityName) throws GeolocationNotFoundException {
         log.info("Start to get geolocation for city with name: " + cityName);
         try{
-            Geolocation[] geolocationTable = restTemplate.getForObject(GEOLOCATION_URL + "?q={cityName}&appid=" + api_key, Geolocation[].class, cityName);
-            if (geolocationTable == null) {
+            String geolocationString = restTemplate.getForObject(GEOLOCATION_URL + "?q={cityName}&appid=" + api_key, String.class, cityName);
+            if (geolocationString == null) {
                 log.error("Error with external API responsible for get geolocation!");
-                throw new ServiceUnavailableException("Error with external API responsible for get geolocation!");
             }
-            List<Geolocation> geolocationList = Arrays.asList(geolocationTable);
-            log.info(geolocationList.get(0).toString());
+            log.info("Response: " + geolocationString);
+            String substring = geolocationString.substring(1, (geolocationString.length() - 1));
 
+            JSONObject jsonObject = new JSONObject(substring);
             Geolocation geolocation = new Geolocation();
-            geolocation.setCountry(geolocationList.get(0).getCountry());
+            geolocation.setCountry(jsonObject.getString("country"));
             geolocation.setCity(cityName);
-            geolocation.setLat(geolocationList.get(0).getLat());
-            geolocation.setLon(geolocationList.get(0).getLon());
-
-            if (geolocationRepository.findByCity(cityName).isEmpty()){
-                geolocationRepository.save(geolocation);
-            }
-
-            GeolocationDto geolocationDto = geolocationMapper.geolocationToGeolocationDto(geolocation);
-            log.info(geolocationDto.toString());
-            return geolocationDto;
-
+            geolocation.setLatitude(jsonObject.getDouble("lat"));
+            geolocation.setLongitude(jsonObject.getDouble("lon"));
+            return geolocationMapper.geolocationToGeolocationDto(geolocation);
         } catch (Exception e) {
             log.error("Error in method getGeolocationDtoByCityName");
-            throw new GeolocationNotFoundException("Not found geolocation for city with name: '" + cityName + "'!");
+            throw new GeolocationNotFoundException("Wrong city name! Not found geolocation for city with name: '" + cityName + "'!");
+        }
+    }
+
+    public GeolocationDto addNewGeolocation(GeolocationDto geolocationDto) throws Exception {
+        log.info("Start to add new geolocation for city: " + geolocationDto.city());
+        try {
+            Geolocation geolocation = new Geolocation();
+            if (getGeolocationDtoByCityName(geolocationDto.city()) != null);
+            geolocation.setCity(geolocationDto.city());
+            geolocation.setCountry(geolocationDto.country());
+            geolocation.setLatitude(geolocationDto.latitude());
+            geolocation.setLongitude(geolocationDto.longitude());
+            geolocationRepository.save(geolocation);
+            return geolocationMapper.geolocationToGeolocationDto(geolocation);
+        } catch (Exception e) {
+            log.error("Error in method addNewGeolocation!");
+            throw new Exception(e.getMessage());
         }
     }
 }

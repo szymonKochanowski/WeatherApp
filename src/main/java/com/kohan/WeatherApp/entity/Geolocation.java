@@ -17,6 +17,6 @@ public class Geolocation {
     private Integer id;
     private String city;
     private String country;
-    private Double lat;
-    private Double lon;
+    private Double latitude;
+    private Double longitude;
 }
