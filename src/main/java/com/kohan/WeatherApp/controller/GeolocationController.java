@@ -24,8 +24,6 @@ public class GeolocationController {
             return ResponseEntity.ok(geolocationService.getGeolocationDtoByCityName(cityName));
         } catch (GeolocationNotFoundException ex) {
             return new ResponseEntity(ex.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

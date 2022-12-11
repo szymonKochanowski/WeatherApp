@@ -1,7 +1,6 @@
 package com.kohan.WeatherApp.service;
 
 import com.kohan.WeatherApp.dto.GeolocationDto;
-import com.kohan.WeatherApp.dto.WeatherDto;
 import com.kohan.WeatherApp.entity.Geolocation;
 import com.kohan.WeatherApp.exception.GeolocationNotFoundException;
 import com.kohan.WeatherApp.mapper.GeolocationMapper;
@@ -12,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import javax.naming.ServiceUnavailableException;
 
 @Service
 @Slf4j
@@ -50,7 +47,7 @@ public class GeolocationService {
             return geolocationMapper.geolocationToGeolocationDto(geolocation);
         } catch (Exception e) {
             log.error("Error in method getGeolocationDtoByCityName");
-            throw new GeolocationNotFoundException("Not found geolocation for city with name: '" + cityName + "'!");
+            throw new GeolocationNotFoundException("Wrong city name! Not found geolocation for city with name: '" + cityName + "'!");
         }
     }
 
@@ -58,6 +55,7 @@ public class GeolocationService {
         log.info("Start to add new geolocation for city: " + geolocationDto.city());
         try {
             Geolocation geolocation = new Geolocation();
+            if (getGeolocationDtoByCityName(geolocationDto.city()) != null);
             geolocation.setCity(geolocationDto.city());
             geolocation.setCountry(geolocationDto.country());
             geolocation.setLatitude(geolocationDto.latitude());

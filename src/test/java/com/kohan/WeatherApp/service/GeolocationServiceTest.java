@@ -14,8 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,7 +37,7 @@ class GeolocationServiceTest {
     private GeolocationRepository geolocationRepository;
 
     @Test
-    void getGeolocationDtoByCityName() throws GeolocationNotFoundException {
+    void getGeolocationDtoByCityName() throws Exception {
         //Given
         String cityName = "krakow";
         GeolocationDto expectedGeolocationDto = new GeolocationDto("krakow", "PL", 50.072136,  19.947226);
@@ -66,7 +64,7 @@ class GeolocationServiceTest {
         //When
         //Then
         assertThrows(GeolocationNotFoundException.class, ()-> geolocationService.getGeolocationDtoByCityName(wrongCityName),
-                "Not found geolocation for city with name: 'krakow'!" );
+                "Wrong city name! Not found geolocation for city with name: 'krakow'!" );
     }
 
     @Test
@@ -74,6 +72,10 @@ class GeolocationServiceTest {
         //Given
         Geolocation geolocation = new Geolocation(1, "krakow", "PL", 50.072136,  19.947226);
         GeolocationDto expectedGeolocationDto = new GeolocationDto("krakow", "PL", 50.072136,  19.947226);
+        String geolocationResponse = "[{\"name\":\"Krakow\",\"local_names\":{\"eu\":\"Krakovia\",\"la\":\"Cracovia\",\"mk\":\"Краков\",\"ro\":\"Cracovia\",\"eo\":\"Krakovo\",\"lt\":\"Krokuva\",\"ja\":\"クラクフ\",\"fa\":\"کراکوف\",\"mt\":\"Krakovja\",\"ca\":\"Cracòvia\",\"zh\":\"克拉科夫\",\"it\":\"Cracovia\",\"fr\":\"Cracovie\",\"pt\":\"Cracóvia\",\"el\":\"Κρακοβία\",\"sr\":\"Краков\",\"en\":\"Krakow\",\"fi\":\"Krakova\",\"lv\":\"Krakova\",\"sl\":\"Krakov\",\"nl\":\"Krakau\",\"sk\":\"Krakov\",\"ar\":\"كراكوف\",\"hr\":\"Krakov\",\"hu\":\"Krakkó\",\"uk\":\"Краків\",\"pl\":\"Kraków\",\"de\":\"Krakau\",\"be\":\"Кракаў\",\"ru\":\"Краков\",\"es\":\"Cracovia\",\"cs\":\"Krakov\"},\"lat\":50.072136,\"lon\":19.947226,\"country\":\"PL\",\"state\":\"Lesser Poland Voivodeship\"}]";
+
+        when(restTemplate.getForObject(anyString(), any(), anyString())).thenReturn(geolocationResponse);
+        when(geolocationMapper.geolocationToGeolocationDto(any())).thenReturn(expectedGeolocationDto);
         when(geolocationRepository.save(any())).thenReturn(geolocation);
         when(geolocationMapper.geolocationToGeolocationDto(any())).thenReturn(expectedGeolocationDto);
         //When

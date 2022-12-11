@@ -35,7 +35,7 @@ public class WeatherService {
         try{
             String weatherString = restTemplate.getForObject(WEATHER_URL + "?lat={latitude}&lon={longitude}&appid=" + api_key + "&units=metric", String.class, latitude, longitude);
             if (weatherString == null) {
-                log.error("Response is null! Error with external API responsible for get weather!");
+                log.error("Error with external API responsible for get weather!");
             }
             log.info("Response: " + weatherString);
             JSONObject jsonObject = new JSONObject(weatherString);
